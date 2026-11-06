@@ -25,10 +25,10 @@ jobs:
         with:
           path: dist
 
-  # Publishes the app to GitHub Pages from the default branch.
+  # Publishes the app to GitHub Pages from master or the FMAREA rebuild branch.
   # Turn it on once in the repository: Settings → Pages → Source: GitHub Actions.
   deploy:
-    if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request'
+    if: (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/claude/fmarea-app-rebuild-1ep5wh') && github.event_name != 'pull_request'
     needs: build
     runs-on: ubuntu-latest
     permissions:

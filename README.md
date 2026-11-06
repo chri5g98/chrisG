@@ -32,7 +32,7 @@ npm test           # unit tests for the planning logic
 npm run build      # production build in dist/
 ```
 
-`dist/` is a static site: it can be hosted anywhere, including a SharePoint document library or GitHub Pages. The workflow in `.github/workflows/ci.yml` tests every push and publishes the default branch to GitHub Pages once Pages is turned on (Settings → Pages → Source: GitHub Actions). Once opened, Edge and Chrome offer to install it as an app, and it keeps working offline.
+`dist/` is a static site: it can be hosted anywhere, including a SharePoint document library or GitHub Pages. The workflow in `.github/workflows/ci.yml` tests every push and publishes `master` or the `claude/fmarea-app-rebuild-1ep5wh` branch to GitHub Pages once Pages is turned on (Settings → Pages → Source: GitHub Actions). Once opened, Edge and Chrome offer to install it as an app, and it keeps working offline.
 
 ## How the code is laid out
 
