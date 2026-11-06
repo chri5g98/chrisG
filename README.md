@@ -34,6 +34,14 @@ npm run build      # production build in dist/
 
 `dist/` is a static site: it can be hosted anywhere, including a SharePoint document library or GitHub Pages. The workflow in `.github/workflows/ci.yml` tests every push and publishes `master` or the `claude/fmarea-app-rebuild-1ep5wh` branch to GitHub Pages once Pages is turned on (Settings → Pages → Source: GitHub Actions). Once opened, Edge and Chrome offer to install it as an app, and it keeps working offline.
 
+## Hosting without a server: the single file
+
+`npm run build:single` makes `single/FMAREA.html`: the whole app in one file, with nothing to install and no web server. Put it in the SharePoint library next to `FMAREA-data.json`. Colleagues sync the library with OneDrive and double-click `FMAREA.html` in their synced folder so it opens in Edge or Chrome, then open the shared data file once from Settings. To update everyone, replace `FMAREA.html` in the library.
+
+The single file needs an internet connection only for its fonts (it falls back to system fonts without one). Opening it straight from SharePoint in the browser does not work, because SharePoint downloads `.html` files instead of running them: open it from the synced folder.
+
+Each push also builds this file; download it from the workflow run's **Artifacts** on GitHub.
+
 ## How the code is laid out
 
 ```

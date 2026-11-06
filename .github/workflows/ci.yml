@@ -21,6 +21,11 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
+      - run: npm run build:single
+      - uses: actions/upload-artifact@v4
+        with:
+          name: FMAREA-single-file
+          path: single/FMAREA.html
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

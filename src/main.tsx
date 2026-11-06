@@ -17,4 +17,4 @@ app.init().then(() => shared.init());
 createRoot(document.getElementById('root')!).render(<StrictMode><App /></StrictMode>);
 
 // works offline once loaded, and can be installed as an app from Edge or Chrome
-if ('serviceWorker' in navigator && import.meta.env.PROD) navigator.serviceWorker.register('./sw.js').catch(() => {});
+if ('serviceWorker' in navigator && import.meta.env.PROD && !import.meta.env.SINGLE) navigator.serviceWorker.register('./sw.js').catch(() => {});
