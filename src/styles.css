@@ -434,3 +434,22 @@ details.dsec[open] summary h3::before{content:"▾ ";}
 #vSvg.editing.tool-draw,#vSvg.editing.tool-hull{cursor:crosshair}
 #vSvg.editing [data-vi]{cursor:pointer}
 
+
+/* ===== React rebuild additions ===== */
+#page{display:flex;flex-direction:column;gap:14px}
+.menu-btn{display:none}
+.rail-scrim{display:none}
+.vtree .vn.drop rect:first-child{stroke:var(--accent);stroke-width:3;fill:var(--accent-soft)}
+@media (max-width:900px){
+  .app{grid-template-columns:minmax(0,1fr)}
+  .rail{position:fixed;left:0;top:0;bottom:0;width:230px;z-index:40;transform:translateX(-100%);transition:transform .18s}
+  .rail.open{transform:none}
+  .rail-scrim{display:block;position:fixed;inset:0;z-index:39;background:rgba(5,4,1,.35)}
+  .menu-btn{display:inline-flex}
+  .ptool .title,.ptool-facts{display:none}
+  main{padding-left:max(14px,env(safe-area-inset-left,0px));padding-right:max(14px,env(safe-area-inset-right,0px))}
+  .ptool{margin:0 -14px;padding:10px 14px}
+  .fgrid,.fgrid3{grid-template-columns:minmax(0,1fr)}
+  .grid2,.grid2.even{grid-template-columns:minmax(0,1fr)}
+}
+@media (prefers-reduced-motion:reduce){.rail{transition:none}}
