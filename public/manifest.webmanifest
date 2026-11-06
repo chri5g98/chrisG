@@ -1,0 +1,10 @@
+{
+  "name": "FMAREA – footprint & area planner",
+  "short_name": "FMAREA",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f8f6f9",
+  "theme_color": "#0f2f4c",
+  "icons": [{ "src": "icon.png", "sizes": "171x34", "type": "image/png" }]
+}
