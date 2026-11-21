@@ -249,7 +249,7 @@ function myAvail(){ const m = me(); return m && S.session && S.session.avail && 
 /* ---------- derived session data ---------- */
 function model(sess){
   const people = sess.people || {}, avail = sess.avail || {};
-  const from = sess.from == null ? 16 : sess.from, to = sess.to == null ? 23 : sess.to;
+  const from = sess.from == null ? 6 : sess.from, to = sess.to == null ? 24 : sess.to;
   const hours = []; for (let h = from; h < to; h++) hours.push(h);
   const ids = Object.keys(people);
   const freeOf = key => ids.filter(p => avail[p] && avail[p][key] === "free").map(p => people[p].name);
@@ -470,8 +470,8 @@ function viewManage(){
     '<section class="card"><span class="kicker">Session settings</span>' +
       '<label class="label">What\'s happening?<input class="input" data-in="mName" maxlength="60" value="' + esc(M.name) + '"></label>' +
       '<div class="label" style="text-transform:none"><span class="kicker">People needed</span>' + stepperHTML("mneed", M.need) + "</div>" +
-      '<div class="row"><label class="label">Hours from<select class="select" data-in="mFrom">' + hrs.filter(h => h < 22).map(h => '<option value="' + h + '"' + (M.from === h ? " selected" : "") + ">" + fmtH(h) + "</option>").join("") + "</select></label>" +
-      '<label class="label">Until<select class="select" data-in="mTo">' + hrs.filter(h => h > M.from && h <= 24).map(h => '<option value="' + h + '"' + (M.to === h ? " selected" : "") + ">" + fmtH(h % 24) + "</option>").join("") + "</select></label></div>" +
+      '<div class="row"><label class="label">Hours from<select class="select" data-in="mFrom">' + hrs.filter(h => h < 24).map(h => '<option value="' + h + '"' + (M.from === h ? " selected" : "") + ">" + fmtH(h) + "</option>").join("") + "</select></label>" +
+      '<label class="label">Until<select class="select" data-in="mTo">' + [...hrs, 24].filter(h => h > M.from).map(h => '<option value="' + h + '"' + (M.to === h ? " selected" : "") + ">" + fmtH(h % 24) + "</option>").join("") + "</select></label></div>" +
       '<button class="btn primary block" type="button" data-act="msave">Save settings</button>' +
     "</section>" +
     '<section class="card"><span class="kicker">Share</span><div class="linkbox">' + esc(baseLink() + S.id) + '</div><div class="row"><button class="btn" type="button" data-act="copy" data-text="' + esc(baseLink() + S.id) + '">Copy session link</button><a class="btn" href="#s/' + esc(S.id) + '">Open calendar</a></div></section>' +
@@ -539,7 +539,7 @@ async function createSession(){
   const err = $("#startErr");
   if (!name){ if (err){ err.textContent = "Give it a name first."; err.hidden = false; } return; }
   const id = rid(8), key = rid(16);
-  const obj = { name, need: S.draft.need, from: 16, to: 23, ownerHash: await sha(key), created: Date.now() };
+  const obj = { name, need: S.draft.need, from: 6, to: 24, ownerHash: await sha(key), created: Date.now() };
   try { await write(id, [], obj); } catch (e) { toast("Couldn't start it. Check your connection and try again."); return; }
   store.set("yf-owner-" + id, key);
   S.created = { id, key, name };
