@@ -18,6 +18,8 @@
 <meta name="twitter:title" content="You free? Tap when you're free">
 <meta name="twitter:image" content="https://chri5g98.github.io/chrisG/youfree/og.png">
 <link rel="icon" href="logo.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shrikhand&family=Work+Sans:wght@400;500;600;700&display=swap">
 <script src="config.js"></script>
@@ -332,6 +334,7 @@ function viewStart(){
       '<span class="error" id="startErr" hidden></span>' +
     "</section>" +
     '<button class="btn primary block" type="button" data-act="create">Start session</button>' +
+    installBlock() +
     '<p class="small" style="text-align:center;margin:0">No account needed. Anyone with the link can join. Inactive sessions are deleted after 30 days.</p>';
 }
 
@@ -488,6 +491,23 @@ function render(){
   if (S.route === "start"){ const n = $("#nameIn"); if (n && document.activeElement !== n) { /* keep caret out of the way */ } }
 }
 
+/* ---------- add to home screen ---------- */
+let deferredInstall = null, showIosHint = false;
+const isStandalone = () => window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+const isIos = () => /iPhone|iPad|iPod/.test(navigator.userAgent);
+function installBlock(){
+  if (isStandalone()) return "";
+  if (!deferredInstall && !isIos()) return "";
+  let html = '<button class="btn block" type="button" data-act="install">Add to home screen</button>';
+  if (showIosHint && !deferredInstall){
+    html += '<div class="card" style="padding:12px"><span class="note">On iPhone: tap the Share button in Safari (the square with an arrow), then "Add to Home Screen".</span></div>';
+  }
+  return html;
+}
+window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); deferredInstall = e; if (S.route === "start") render(); });
+window.addEventListener("appinstalled", () => { deferredInstall = null; render(); });
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+
 /* ---------- routing ---------- */
 function parseHash(){
   const p = location.hash.slice(1).split("/");
@@ -588,6 +608,15 @@ function act(name, el){
     }
     case "mneed": {
       S.m.need = Math.max(0, Math.min(20, S.m.need + Number(d.d))); return render();
+    }
+    case "install": {
+      if (deferredInstall){
+        const p = deferredInstall; deferredInstall = null;
+        p.prompt();
+        p.userChoice.finally(() => render());
+        return;
+      }
+      showIosHint = true; return render();
     }
     case "copy": return copyText(d.text);
     case "open": location.hash = "#s/" + S.created.id; S.created = null; return;
