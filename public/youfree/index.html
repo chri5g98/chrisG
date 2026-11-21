@@ -1,0 +1,640 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>You free?</title>
+<meta name="description" content="Pick a time everyone's free, for padel, poker, dinner or a pint.">
+<meta name="theme-color" content="#D9572B">
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shrikhand&family=Work+Sans:wght@400;500;600;700&display=swap">
+<script src="config.js"></script>
+<style>
+:root{--paper:#F3E5CC;--card:#FBF3E4;--ink:#3B2412;--muted:#7A5A3E;--orange:#D9572B;--mustard:#E9A23B;--teal:#2E8C86;--sand:#F3D9A6;--white:#FFFFFF;color-scheme:light}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;background:var(--paper);color:var(--ink);font-family:'Work Sans',system-ui,sans-serif;font-size:15px;line-height:1.4}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+.stripes{height:14px;background:repeating-linear-gradient(90deg,var(--mustard) 0 40px,var(--orange) 40px 80px,var(--teal) 80px 120px)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px max(18px,env(safe-area-inset-right,0px)) 0 max(18px,env(safe-area-inset-left,0px))}
+.brand{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--orange)}
+.brand img{width:52px;height:52px}
+.brand span{font-family:'Shrikhand',cursive;font-size:24px;line-height:1}
+.top .link{font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink);text-decoration:underline;text-underline-offset:4px}
+.page{flex:1;display:flex;flex-direction:column;gap:14px;padding:14px max(18px,env(safe-area-inset-right,0px)) 22px max(18px,env(safe-area-inset-left,0px));width:100%;max-width:560px;margin:0 auto;min-height:calc(100dvh - 90px)}
+.h1{font-family:'Shrikhand',cursive;font-weight:400;font-size:38px;line-height:1.02;margin:0}
+.h2{font-family:'Shrikhand',cursive;font-weight:400;font-size:24px;line-height:1.1;margin:0}
+.kicker{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.muted{color:var(--muted)}
+.small{font-size:12.5px;color:var(--muted)}
+.card{background:var(--card);border:3px solid var(--ink);padding:14px;display:flex;flex-direction:column;gap:12px}
+.label{display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.input,.select{width:100%;padding:11px;border:2px solid var(--ink);background:var(--white);font-weight:500;font-size:16px;border-radius:0}
+.btn{border:3px solid var(--ink);background:var(--card);color:var(--ink);font-weight:700;font-size:14px;text-transform:uppercase;letter-spacing:.04em;padding:11px 14px;min-height:46px;display:inline-flex;align-items:center;justify-content:center;text-align:center;text-decoration:none}
+.btn.primary{background:var(--teal);border-color:var(--ink);color:var(--card)}
+.btn.warn{color:var(--orange);border-color:var(--orange)}
+.btn.block{width:100%}
+.btn[disabled]{opacity:.5;cursor:default}
+.stepper{display:flex;align-items:center;gap:10px}
+.stepper button{width:40px;height:40px;border:3px solid var(--ink);background:var(--card);font-size:20px;font-weight:700;padding:0}
+.stepper .val{min-width:56px;text-align:center;font-family:'Shrikhand',cursive;font-size:30px;line-height:1}
+.stepper .val.none{font-size:34px;color:var(--muted)}
+.steps{display:grid;gap:10px}
+.step{display:grid;grid-template-columns:38px 1fr;gap:12px;align-items:start}
+.step b{width:38px;height:38px;display:flex;align-items:center;justify-content:center;font-family:'Shrikhand',cursive;font-weight:400;font-size:20px;border:3px solid var(--ink);background:var(--mustard);color:var(--ink)}
+.step:nth-child(2) b{background:var(--orange);color:var(--card)}
+.step:nth-child(3) b{background:var(--teal);color:var(--card)}
+.step strong{display:block;font-size:15px}
+.band{height:12px;background:repeating-linear-gradient(90deg,var(--teal) 0 24px,var(--card) 24px 48px,var(--orange) 48px 72px,var(--card) 72px 96px)}
+.note{font-size:12.5px;color:var(--muted)}
+.error{color:var(--orange);font-weight:700;font-size:13px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{padding:4px 10px;border:2px solid var(--ink);background:var(--card);font-size:13px;font-weight:600}
+.chip.hot{background:var(--teal);color:var(--card)}
+.chip.sub{border-style:dashed;color:var(--muted)}
+.bestrow{display:flex;gap:8px;flex-wrap:wrap}
+.best{padding:7px 10px;border:3px solid var(--ink);background:var(--card);font-weight:700;font-size:13px;text-align:left}
+.best.hot{background:var(--teal);color:var(--card)}
+.banner{background:var(--mustard);border:3px solid var(--ink);padding:10px 12px;font-weight:700;font-size:14px}
+.weeknav{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.weeknav .wk{font-family:'Shrikhand',cursive;font-size:19px}
+.arrow{width:38px;height:38px;border:3px solid var(--ink);background:var(--card);font-size:18px;font-weight:700;padding:0}
+.arrow[disabled]{opacity:.35}
+.cal{flex:1;min-height:380px;display:flex;flex-direction:column;background:var(--card);border:3px solid var(--ink);padding:0;overflow:hidden}
+.gridrow{display:grid;grid-template-columns:34px repeat(7,minmax(0,1fr))}
+.dayrow{border-bottom:3px solid var(--ink)}
+.dayh{border:0;border-left:1px solid var(--ink);background:var(--card);padding:6px 0 5px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:1px}
+.dayh:first-child{border-left:0}
+.dayh .dn{font-size:10px;font-weight:700;text-transform:uppercase;color:var(--muted)}
+.dayh .dd{font-family:'Shrikhand',cursive;font-size:16px;line-height:1.1}
+.dayh.on{background:var(--ink);color:var(--sand)}
+.dayh.on .dn{color:var(--sand)}
+.dayh.today .dd{color:var(--orange)}
+.dayh.on.today .dd{color:var(--sand)}
+.body{flex:1;display:flex;flex-direction:column;min-height:0}
+.body .gridrow{flex:1;min-height:0;border-bottom:1px solid var(--ink)}
+.hr{font-size:10px;font-weight:700;color:var(--muted);text-align:right;padding:6px 5px 0 0}
+.cell{border:0;border-left:1px solid var(--ink);font-weight:700;font-size:14px;padding:0;min-height:30px;background:var(--card);color:var(--ink)}
+.cell:first-child{border-left:0}
+.c1{background:var(--sand)}
+.c2{background:var(--mustard)}
+.c3{background:var(--orange);color:var(--card)}
+.cg{background:var(--teal);color:var(--card)}
+.cell.past{background:repeating-linear-gradient(135deg,var(--card) 0 5px,#E8D8B8 5px 6px);color:var(--muted);cursor:default}
+.cell.sel{box-shadow:inset 0 0 0 3px var(--ink)}
+.cell.mine{box-shadow:inset 0 0 0 6px var(--ink)}
+.cell.sel.mine{box-shadow:inset 0 0 0 3px var(--ink),inset 0 0 0 7px var(--card)}
+.legend{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:11px;font-weight:600;color:var(--muted)}
+.legend i{display:inline-block;width:12px;height:12px;border:1px solid var(--ink);vertical-align:-2px;margin-right:3px}
+.detail{display:flex;flex-direction:column;gap:10px}
+.dtitle{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.seg{display:flex;border:3px solid var(--ink)}
+.seg button{flex:1;padding:10px 0;border:0;border-left:2px solid var(--ink);background:var(--card);font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.03em}
+.seg button:first-child{border-left:0}
+.seg button.on{background:var(--teal);color:var(--card)}
+.seg button.on.maybe{background:var(--mustard);color:var(--ink)}
+.seg button.on.no{background:var(--ink);color:var(--card)}
+.toast{position:fixed;left:50%;bottom:max(18px,env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--card);padding:10px 16px;font-weight:600;font-size:14px;z-index:9}
+.share{display:flex;flex-direction:column;gap:10px}
+.linkbox{word-break:break-all;font-size:12px;border:2px dashed var(--ink);padding:8px;background:var(--white)}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.row>*{flex:1 1 auto}
+.spacer{flex:1}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="stripes" aria-hidden="true"></div>
+<header class="top">
+  <a class="brand" href="#" aria-label="You free? home">
+    <img src="logo.svg" alt="">
+    <span>You free?</span>
+  </a>
+  <a class="link" id="topLink" href="#">New session</a>
+</header>
+<main id="app" class="page" aria-live="polite"></main>
+<script>
+(function(){
+"use strict";
+
+/* ---------- config and small helpers ---------- */
+const CFG = window.YOUFREE_CONFIG || {};
+const DB = String(CFG.databaseURL || "").trim().replace(/\/+$/, "");
+const LOCAL = !DB;
+const APP = document.getElementById("app");
+const $ = (s, r) => (r || document).querySelector(s);
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
+const pad = n => String(n).padStart(2, "0");
+const ymd = d => d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+const slotKey = (d, h) => ymd(d) + "_" + pad(h);
+const fmtH = h => (h % 12 || 12) + (h < 12 ? "am" : "pm");
+const fmtDay = d => d.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" });
+const rid = n => { const a = "abcdefghjkmnpqrstuvwxyz23456789"; return Array.from(crypto.getRandomValues(new Uint8Array(n)), x => a[x % a.length]).join(""); };
+async function sha(s){ const d = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s)); return Array.from(new Uint8Array(d), x => x.toString(16).padStart(2, "0")).join(""); }
+const store = {
+  get(k){ try { return localStorage.getItem(k); } catch (e) { return null; } },
+  set(k, v){ try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (e) {} }
+};
+function parseKey(k){ const [ds, hs] = k.split("_"); const [y, m, d] = ds.split("-").map(Number); return { d: new Date(y, m - 1, d), h: +hs }; }
+function isPast(d, h){ return new Date(d.getFullYear(), d.getMonth(), d.getDate(), h + 1) <= new Date(); }
+function weekDays(w){
+  const t = new Date(); t.setHours(0, 0, 0, 0);
+  const dow = (t.getDay() + 6) % 7;
+  const mon = new Date(t.getFullYear(), t.getMonth(), t.getDate() - dow + 7 * w);
+  return Array.from({ length: 7 }, (_, i) => new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + i));
+}
+let toastT;
+function toast(msg){
+  let el = document.querySelector(".toast");
+  if (!el){ el = document.createElement("div"); el.className = "toast"; el.setAttribute("role", "status"); document.body.appendChild(el); }
+  el.textContent = msg; clearTimeout(toastT); toastT = setTimeout(() => el.remove(), 2400);
+}
+function copyText(text){
+  const ok = () => toast("Copied");
+  const fail = () => toast("Couldn't copy here. Select the text and copy it.");
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(ok, fail); else fail();
+}
+
+/* ---------- storage: Firebase if configured, otherwise this phone only ---------- */
+function setAt(obj, parts, val){
+  let o = obj;
+  for (let i = 0; i < parts.length - 1; i++){
+    if (o[parts[i]] == null || typeof o[parts[i]] !== "object"){ if (val === null) return; o[parts[i]] = {}; }
+    o = o[parts[i]];
+  }
+  const last = parts[parts.length - 1];
+  if (val === null) delete o[last]; else o[last] = val;
+}
+function localRoot(){ try { return JSON.parse(store.get("yf-local") || '{"sessions":{}}'); } catch (e) { return { sessions: {} }; } }
+const localWatchers = {};
+function emitLocal(id){ const cb = localWatchers[id]; if (cb) cb(localRoot().sessions[id] || null); }
+
+async function write(id, parts, val){
+  if (LOCAL){
+    const root = localRoot();
+    if (!parts.length){ if (val === null) delete root.sessions[id]; else root.sessions[id] = val; }
+    else if (root.sessions[id]) setAt(root.sessions[id], parts, val);
+    store.set("yf-local", JSON.stringify(root));
+    emitLocal(id);
+    return;
+  }
+  const url = DB + "/sessions/" + id + (parts.length ? "/" + parts.join("/") : "") + ".json";
+  const r = await fetch(url, { method: val === null ? "DELETE" : "PUT", body: val === null ? undefined : JSON.stringify(val) });
+  if (!r.ok) throw new Error("save " + r.status);
+}
+
+// Calls cb with the whole session (or null) every time it changes. Returns a stop function.
+function watch(id, cb, onStatus){
+  if (LOCAL){
+    localWatchers[id] = cb;
+    setTimeout(() => cb(localRoot().sessions[id] || null), 0);
+    onStatus && onStatus(true);
+    return () => { delete localWatchers[id]; };
+  }
+  let cur = undefined;
+  const es = new EventSource(DB + "/sessions/" + id + ".json");
+  es.addEventListener("put", e => {
+    const m = JSON.parse(e.data);
+    if (m.path === "/"){ cur = m.data; }
+    else { if (cur == null) cur = {}; setAt(cur, m.path.split("/").filter(Boolean), m.data); }
+    cb(cur == null ? null : cur); onStatus && onStatus(true);
+  });
+  es.addEventListener("patch", e => {
+    const m = JSON.parse(e.data);
+    if (cur == null) cur = {};
+    const base = m.path.split("/").filter(Boolean);
+    for (const k in m.data) setAt(cur, base.concat([k]), m.data[k]);
+    cb(cur); onStatus && onStatus(true);
+  });
+  es.onopen = () => onStatus && onStatus(true);
+  es.onerror = () => onStatus && onStatus(false);
+  return () => es.close();
+}
+
+/* ---------- state ---------- */
+const S = {
+  route: "start", id: null, key: null,
+  session: undefined, stop: null, loadedOnce: false,
+  week: 0, sel: null, delArm: false,
+  draft: { name: "", need: 4 },
+  created: null,
+  joinName: "",
+  m: null,
+  online: true
+};
+
+function me(){
+  const raw = store.get("yf-me-" + S.id);
+  try { const v = JSON.parse(raw || "null"); if (v && S.session && S.session.people && S.session.people[v.pid]) return v; } catch (e) {}
+  return null;
+}
+function myAvail(){ const m = me(); return m && S.session && S.session.avail && S.session.avail[m.pid] || {}; }
+
+/* ---------- derived session data ---------- */
+function model(sess){
+  const people = sess.people || {}, avail = sess.avail || {};
+  const from = sess.from == null ? 16 : sess.from, to = sess.to == null ? 23 : sess.to;
+  const hours = []; for (let h = from; h < to; h++) hours.push(h);
+  const ids = Object.keys(people);
+  const freeOf = key => ids.filter(p => avail[p] && avail[p][key] === "free").map(p => people[p].name);
+  const maybeOf = key => ids.filter(p => avail[p] && avail[p][key] === "maybe").map(p => people[p].name);
+  return { people, hours, freeOf, maybeOf, need: sess.need || 0 };
+}
+function shadeClass(n, need){
+  if (need > 0 && n >= need) return "cg";
+  if (n >= 3) return "c3";
+  if (n === 2) return "c2";
+  if (n === 1) return "c1";
+  return "";
+}
+function quip(n, need){
+  if (need > 0){
+    if (n >= need) return "Far out, deal in!";
+    if (n === need - 1) return "One short, groovy.";
+    if (n >= 1) return "Not yet, keep at it.";
+    return "Nobody free yet.";
+  }
+  return n === 0 ? "Nobody free yet." : n + " free so far.";
+}
+function bestSlots(m){
+  const out = [];
+  for (const w of [0, 1, 2, 3]) for (const d of weekDays(w)) for (const h of m.hours){
+    if (isPast(d, h)) continue;
+    const k = slotKey(d, h), f = m.freeOf(k).length;
+    if (f >= 2 && (m.need === 0 || f >= Math.min(2, m.need))) out.push({ k, f });
+  }
+  return out.sort((a, b) => b.f - a.f || (a.k < b.k ? -1 : 1)).slice(0, 2);
+}
+function ownerKeyFor(id){ return store.get("yf-owner-" + id); }
+
+/* ---------- views ---------- */
+function stepperHTML(act, value){
+  const none = value === 0;
+  return '<div class="stepper">' +
+    '<button type="button" data-act="' + act + '" data-d="-1" aria-label="One fewer">−</button>' +
+    '<span class="val' + (none ? " none" : "") + '"' + (none ? ' aria-label="Not applicable"' : "") + '>' + (none ? "∅" : value) + "</span>" +
+    '<button type="button" data-act="' + act + '" data-d="1" aria-label="One more">+</button>' +
+  "</div>" +
+  '<span class="note">' + (none ? "∅ means no minimum. Everyone just sees who's free." : "Slots light up at this number.") + "</span>";
+}
+
+function viewStart(){
+  const sh = S.created;
+  if (sh){
+    const base = location.origin + location.pathname;
+    const link = base + "#s/" + sh.id;
+    const mlink = base + "#m/" + sh.id + "/" + sh.key;
+    const wa = "https://wa.me/?text=" + encodeURIComponent("Are you free for " + sh.name + "? Tap your times here: " + link);
+    return '<section class="card share">' +
+      '<span class="kicker">Session ready</span>' +
+      '<h2 class="h2">' + esc(sh.name) + "</h2>" +
+      '<span class="note">Share this link. Anyone with it can join.</span>' +
+      '<div class="linkbox">' + esc(link) + "</div>" +
+      '<div class="row"><button class="btn primary" type="button" data-act="copy" data-text="' + esc(link) + '">Copy link</button>' +
+      '<a class="btn" href="' + esc(wa) + '" target="_blank" rel="noopener">WhatsApp</a></div>' +
+      '<span class="note">Keep your organiser link private. It is the only way to book the slot and change settings.</span>' +
+      '<div class="linkbox">' + esc(mlink) + "</div>" +
+      '<div class="row"><button class="btn" type="button" data-act="copy" data-text="' + esc(mlink) + '">Copy organiser link</button>' +
+      '<button class="btn primary" type="button" data-act="open">Open session</button></div>' +
+      "</section>";
+  }
+  return '<section class="h1-wrap">' +
+      '<h1 class="h1">Start a session</h1>' +
+      '<p class="muted" style="margin:6px 0 0">Say what\'s happening, share the link, and let people tap when they\'re free.</p>' +
+    "</section>" +
+    '<section class="card" aria-label="How it works">' +
+      '<span class="kicker">How it works</span>' +
+      '<div class="steps">' +
+        '<div class="step"><b>1</b><div><strong>Name it</strong><span class="muted">Padel, poker, dinner, a pint.</span></div></div>' +
+        '<div class="step"><b>2</b><div><strong>Share the link</strong><span class="muted">Post it in the group chat.</span></div></div>' +
+        '<div class="step"><b>3</b><div><strong>Tap when you\'re free</strong><span class="muted">The best time lights up when enough people can make it.</span></div></div>' +
+      "</div>" +
+    "</section>" +
+    '<section class="card">' +
+      '<label class="label">What\'s happening?' +
+        '<input class="input" id="nameIn" data-in="name" maxlength="60" placeholder="Padel, poker, dinner, a pint…" value="' + esc(S.draft.name) + '">' +
+      "</label>" +
+      '<div class="label" style="text-transform:none"><span class="kicker">People needed</span>' + stepperHTML("need", S.draft.need) + "</div>" +
+      '<span class="error" id="startErr" hidden></span>' +
+    "</section>" +
+    '<button class="btn primary block" type="button" data-act="create">Start session</button>' +
+    '<p class="small" style="text-align:center;margin:0">No account needed. Anyone with the link can join. Inactive sessions are deleted after 30 days.</p>';
+}
+
+function viewSession(){
+  const sess = S.session;
+  if (sess === undefined) return '<p class="muted">Loading the session…</p>';
+  if (sess === null) return '<section class="card"><h2 class="h2">Session not found</h2><p class="muted" style="margin:0">It may have been deleted or has expired.</p><a class="btn primary" href="#">Start a new one</a></section>';
+  const m = model(sess), mine = me(), mAv = myAvail();
+  const w = S.week;
+  const days = weekDays(w), today = new Date(); today.setHours(0, 0, 0, 0);
+  if (!S.sel){ const b = bestSlots(m)[0]; S.sel = b ? b.k : slotKey(new Date(), m.hours[0]); }
+  const { d: selDay, h: selHour } = parseKey(S.sel);
+  const freeNow = m.freeOf(S.sel), maybeNow = m.maybeOf(S.sel), n = freeNow.length;
+  const owner = ownerKeyFor(S.id);
+  const bestBits = bestSlots(m).map(b => {
+    const p = parseKey(b.k);
+    return '<button class="best' + (b.f >= m.need && m.need > 0 ? " hot" : "") + '" type="button" data-act="best" data-k="' + b.k + '">' +
+      fmtDay(p.d) + ", " + fmtH(p.h) + " · " + b.f + " free</button>";
+  }).join("");
+  const booked = sess.booked ? '<div class="banner">Booked: ' + esc(slotLabel(sess.booked.key)) + " · " + esc(sess.booked.dur) + "</div>" : "";
+  const joinBlock = mine ? "" :
+    '<section class="card"><span class="kicker">Who\'s playing?</span>' +
+      '<label class="label">Your name<input class="input" data-in="joinName" maxlength="20" placeholder="e.g. Sam" value="' + esc(S.joinName) + '"></label>' +
+      '<button class="btn primary block" type="button" data-act="join">Join</button>' +
+    "</section>";
+  let head = "";
+  for (const dd of days){
+    const on = m.hours.length && m.hours.every(h => mAv[slotKey(dd, h)] === "free");
+    const isToday = dd.getTime() === today.getTime();
+    head += '<button class="dayh' + (on ? " on" : "") + (isToday ? " today" : "") + '" type="button" data-act="day" data-d="' + ymd(dd) + '" aria-label="Select the whole of ' + fmtDay(dd) + '">' +
+      '<span class="dn">' + dd.toLocaleDateString("en-GB", { weekday: "short" }) + '</span><span class="dd">' + dd.getDate() + "</span></button>";
+  }
+  let rows = "";
+  for (const h of m.hours){
+    rows += '<div class="gridrow"><span class="hr">' + fmtH(h) + "</span>";
+    for (const dd of days){
+      const k = slotKey(dd, h), f = m.freeOf(k).length, past = isPast(dd, h);
+      const cls = ["cell", past ? "past" : "", shadeClass(f, m.need), k === S.sel ? "sel" : "", mAv[k] === "free" ? "mine" : ""].join(" ").replace(/\s+/g, " ");
+      rows += '<button class="' + cls + '" type="button" data-act="cell" data-k="' + k + '"' + (past ? " disabled" : "") + ' aria-label="' + fmtDay(dd) + " " + fmtH(h) + ", " + f + ' free">' + (f ? f : "") + "</button>";
+    }
+    rows += "</div>";
+  }
+  const statusNow = mAv[S.sel] || "";
+  const seg = mine && !isPast(selDay, selHour)
+    ? '<div class="seg" role="group" aria-label="Your availability">' +
+        '<button type="button" class="' + (statusNow === "free" ? "on" : "") + '" data-act="status" data-s="free">Free</button>' +
+        '<button type="button" class="' + (statusNow === "maybe" ? "on maybe" : "") + '" data-act="status" data-s="maybe">Maybe</button>' +
+        '<button type="button" class="' + (statusNow === "" ? "on no" : "") + '" data-act="status" data-s="">Not free</button>' +
+      "</div>"
+    : (mine ? "" : '<p class="note" style="margin:0">Join above to tap your times.</p>');
+  const dayBtn = mine ? '<button class="btn" type="button" data-act="wholeday" data-d="' + ymd(selDay) + '">Whole ' + selDay.toLocaleDateString("en-GB", { weekday: "long" }) + "</button>" : "";
+  return '<section style="display:flex;flex-direction:column;gap:6px">' +
+      '<div class="row" style="justify-content:space-between;align-items:center"><span class="kicker">' + (sess.need ? "Needs " + sess.need : "No minimum") + " · " + Object.keys(m.people).length + ' joined</span>' +
+      (owner ? '<a class="small" href="#m/' + esc(S.id) + '">Organiser</a>' : "") + "</div>" +
+      '<h1 class="h1" style="font-size:34px">' + esc(sess.name) + "</h1>" +
+    "</section>" +
+    booked +
+    joinBlock +
+    (bestBits ? '<section style="display:flex;flex-direction:column;gap:6px"><span class="kicker">Best times</span><div class="bestrow">' + bestBits + "</div></section>" : "") +
+    '<div class="weeknav"><button class="arrow" type="button" data-act="week" data-d="-1" aria-label="Previous week"' + (w === 0 ? " disabled" : "") + ">‹</button>" +
+      '<span class="wk">' + (w === 0 ? "This week" : w === 1 ? "Next week" : days[0].toLocaleDateString("en-GB", { day: "numeric", month: "short" }) + " – " + days[6].toLocaleDateString("en-GB", { day: "numeric", month: "short" })) + "</span>" +
+      '<button class="arrow" type="button" data-act="week" data-d="1" aria-label="Next week"' + (w >= 3 ? " disabled" : "") + ">›</button></div>" +
+    '<section class="cal" aria-label="Calendar">' +
+      '<div class="gridrow dayrow"><span></span>' + head + "</div>" +
+      '<div class="body">' + rows + "</div>" +
+    "</section>" +
+    '<div class="legend"><span><i style="background:var(--sand)"></i>1 free</span><span><i style="background:var(--mustard)"></i>2</span><span><i style="background:var(--orange)"></i>3+</span>' + (m.need ? '<span><i style="background:var(--teal)"></i>' + m.need + " · game on</span>" : "") + "</div>" +
+    '<section class="card detail" aria-live="polite">' +
+      '<div class="dtitle"><span class="h2" style="font-size:21px">' + esc(fmtDay(selDay)) + ", " + fmtH(selHour) + "–" + fmtH(selHour + 1) + "</span>" +
+      '<span class="small" style="font-weight:700">' + quip(n, m.need) + "</span></div>" +
+      '<div class="chips">' + (freeNow.length ? freeNow.map((x, i) => '<span class="chip' + (m.need && i >= m.need ? " sub" : "") + '">' + esc(x) + (m.need && i >= m.need ? " (bench)" : "") + "</span>").join("") : '<span class="note">Nobody free in this hour yet.</span>') + "</div>" +
+      (maybeNow.length ? '<div class="note">Maybe: ' + maybeNow.map(esc).join(", ") + " · doesn't count towards the total</div>" : "") +
+      seg +
+      '<div class="row">' + dayBtn + (sess.booked ? "" : "") + "</div>" +
+    "</section>" +
+    '<p class="small" style="text-align:center;margin:0">Tap a slot to see who\'s free. Tap a day name to select the whole day.</p>' +
+    (mine ? '<p class="small" style="text-align:center;margin:0">Playing as ' + esc(mine.name) + ' · <button type="button" class="link-btn" data-act="switchme" style="background:none;border:0;padding:0;color:var(--orange);font-weight:700;text-decoration:underline">not you?</button></p>' : "") +
+    (n >= 1 && m.need && n >= m.need ? '<div class="row"><a class="btn primary" target="_blank" rel="noopener" href="' + esc(waLink(sess, S.sel, freeNow)) + '">Send to WhatsApp</a></div>' : "") +
+    (S.online ? "" : '<p class="error" style="margin:0">Can\'t reach the calendar right now. Your taps will try again when you\'re back online.</p>');
+}
+
+function slotLabel(k){ const p = parseKey(k); return fmtDay(p.d) + ", " + fmtH(p.h); }
+function baseLink(){ return location.origin + location.pathname + "#s/"; }
+function waLink(sess, key, names){
+  const p = parseKey(key);
+  const text = "📅 " + sess.name + "\n" + fmtDay(p.d) + ", " + fmtH(p.h) + "\nIn: " + (names.join(", ") || "nobody yet") +
+    "\nWho's coming? " + baseLink() + S.id;
+  return "https://wa.me/?text=" + encodeURIComponent(text);
+}
+
+function viewManage(){
+  const sess = S.session;
+  if (sess === undefined) return '<p class="muted">Loading the session…</p>';
+  if (sess === null) return '<section class="card"><h2 class="h2">Session not found</h2><a class="btn primary" href="#">Start a new one</a></section>';
+  if (S.key === undefined || !S.ownerOk){
+    return '<section class="card"><span class="kicker">Organiser only</span><h2 class="h2">This isn\'t the organiser link</h2>' +
+      '<p class="muted" style="margin:0">Ask the person who started it for the organiser link. You can still <a href="#s/' + esc(S.id) + '">open the session</a>.</p></section>';
+  }
+  const m = model(sess);
+  if (!S.m){
+    const b = bestSlots(model(sess))[0];
+    const first = b ? parseKey(b.k) : null;
+    S.m = {
+      date: ymd(first ? first.d : new Date()),
+      time: String(first ? first.h : (m.hours[0] || 18)),
+      dur: "1h 30m",
+      name: sess.name, need: sess.need || 0, from: m.hours[0], to: (m.hours[m.hours.length - 1] || 22) + 1
+    };
+  }
+  const M = S.m;
+  const hrs = []; for (let h = 6; h <= 23; h++) hrs.push(h);
+  const booked = sess.booked ? parseKey(sess.booked.key) : null;
+  const bookedFree = sess.booked ? m.freeOf(sess.booked.key) : [];
+  const bookedMaybe = sess.booked ? m.maybeOf(sess.booked.key) : [];
+  const msgKey = booked ? sess.booked.key : slotKey(new Date(M.date + "T00:00"), +M.time);
+  const msgParts = parseKey(msgKey);
+  const msg = "📅 " + sess.name + "\n" + fmtDay(msgParts.d) + ", " + fmtH(msgParts.h) + (booked ? " · " + sess.booked.dur : "") + "\nIn: " + ((booked ? bookedFree : m.freeOf(msgKey)).join(", ") || "nobody yet") + "\nWho's coming? " + baseLink() + S.id;
+  const toHours = h => '<option value="' + h + '"' + (+M.time === h ? " selected" : "") + ">" + fmtH(h) + "</option>";
+  return '<section style="display:flex;flex-direction:column;gap:4px"><span class="kicker">Organiser</span>' +
+      '<h1 class="h1" style="font-size:34px">' + esc(sess.name) + "</h1>" +
+      '<p class="muted" style="margin:0">Only people with this link can see this page.</p></section>' +
+    (sess.booked ? '<div class="banner">Booked: ' + esc(slotLabel(sess.booked.key)) + " · " + esc(sess.booked.dur) + "</div>" : "") +
+    '<section class="card"><span class="kicker">Book a time</span>' +
+      '<div class="row"><label class="label" style="flex:2">Day<input class="input" type="date" data-in="mDate" value="' + esc(M.date) + '"></label>' +
+      '<label class="label" style="flex:1">Start<select class="select" data-in="mTime">' + hrs.map(toHours).join("") + "</select></label></div>" +
+      '<label class="label">How long<select class="select" data-in="mDur">' + ["1h", "1h 30m", "2h", "2h 30m", "3h"].map(x => '<option' + (x === M.dur ? " selected" : "") + ">" + x + "</option>").join("") + "</select></label>" +
+      '<div class="row"><button class="btn primary" type="button" data-act="mbook">Mark as booked</button>' +
+      (sess.booked ? '<button class="btn" type="button" data-act="mclear">Clear booking</button>' : "") + "</div>" +
+      '<div class="note">Duration is set here, once the time is booked. Nobody sees it before then.</div>' +
+      '<div class="linkbox" style="white-space:pre-wrap;font-size:13px">' + esc(msg) + "</div>" +
+      '<div class="row"><button class="btn" type="button" data-act="copy" data-text="' + esc(msg) + '">Copy WhatsApp message</button></div>' +
+    "</section>" +
+    '<section class="card"><span class="kicker">Session settings</span>' +
+      '<label class="label">What\'s happening?<input class="input" data-in="mName" maxlength="60" value="' + esc(M.name) + '"></label>' +
+      '<div class="label" style="text-transform:none"><span class="kicker">People needed</span>' + stepperHTML("mneed", M.need) + "</div>" +
+      '<div class="row"><label class="label">Hours from<select class="select" data-in="mFrom">' + hrs.filter(h => h < 22).map(h => '<option value="' + h + '"' + (M.from === h ? " selected" : "") + ">" + fmtH(h) + "</option>").join("") + "</select></label>" +
+      '<label class="label">Until<select class="select" data-in="mTo">' + hrs.filter(h => h > M.from && h <= 24).map(h => '<option value="' + h + '"' + (M.to === h ? " selected" : "") + ">" + fmtH(h % 24) + "</option>").join("") + "</select></label></div>" +
+      '<button class="btn primary block" type="button" data-act="msave">Save settings</button>' +
+    "</section>" +
+    '<section class="card"><span class="kicker">Share</span><div class="linkbox">' + esc(baseLink() + S.id) + '</div><div class="row"><button class="btn" type="button" data-act="copy" data-text="' + esc(baseLink() + S.id) + '">Copy session link</button><a class="btn" href="#s/' + esc(S.id) + '">Open calendar</a></div></section>' +
+    '<section class="card"><span class="kicker">Delete</span><p class="muted" style="margin:0">Deleting removes everyone\'s taps. This can\'t be undone.</p>' +
+      '<button class="btn warn block" type="button" data-act="mdel">' + (S.delArm ? "Tap again to delete for good" : "Delete session") + "</button></section>";
+}
+
+/* ---------- rendering ---------- */
+function render(){
+  let html = "";
+  if (S.route === "start") html = viewStart();
+  else if (S.route === "session") html = viewSession();
+  else if (S.route === "manage") html = viewManage();
+  APP.innerHTML = html;
+  const top = $("#topLink");
+  if (top) top.hidden = S.route === "start";
+  if (S.route === "start"){ const n = $("#nameIn"); if (n && document.activeElement !== n) { /* keep caret out of the way */ } }
+}
+
+/* ---------- routing ---------- */
+function parseHash(){
+  const p = location.hash.slice(1).split("/");
+  if (p[0] === "s" && p[1]) return { route: "session", id: p[1].replace(/[^a-z0-9]/gi, "") };
+  if (p[0] === "m" && p[1]) return { route: "manage", id: p[1].replace(/[^a-z0-9]/gi, ""), key: p[2] || "" };
+  return { route: "start" };
+}
+async function route(){
+  if (S.stop){ S.stop(); S.stop = null; }
+  const r = parseHash();
+  S.route = r.route; S.id = r.id || null; S.session = undefined; S.sel = null; S.week = 0; S.delArm = false; S.m = null; S.ownerOk = false;
+  if (S.route === "start"){ render(); return; }
+  if (S.route === "manage" && r.key) store.set("yf-owner-" + S.id, r.key);
+  S.key = S.route === "manage" ? (r.key || ownerKeyFor(S.id) || "") : undefined;
+  S.stop = watch(S.id, async sess => {
+    S.session = sess;
+    if (S.route === "manage" && sess && S.key){
+      S.ownerOk = (await sha(S.key)) === sess.ownerHash;
+    }
+    render();
+  }, ok => { S.online = ok; render(); });
+  render();
+  setTimeout(() => { if (S.session === undefined){ S.session = null; render(); } }, 10000);
+}
+
+/* ---------- actions ---------- */
+async function createSession(){
+  const name = (S.draft.name || "").trim().replace(/\s+/g, " ");
+  const err = $("#startErr");
+  if (!name){ if (err){ err.textContent = "Give it a name first."; err.hidden = false; } return; }
+  const id = rid(8), key = rid(16);
+  const obj = { name, need: S.draft.need, from: 16, to: 23, ownerHash: await sha(key), created: Date.now() };
+  try { await write(id, [], obj); } catch (e) { toast("Couldn't start it. Check your connection and try again."); return; }
+  store.set("yf-owner-" + id, key);
+  S.created = { id, key, name };
+  S.draft = { name: "", need: S.draft.need };
+  render();
+}
+async function join(){
+  const name = (S.joinName || "").trim().replace(/\s+/g, " ");
+  if (!name){ toast("Type your name first."); return; }
+  const pid = rid(8);
+  try { await write(S.id, ["people", pid], { name, at: Date.now() }); }
+  catch (e){ toast("Couldn't join. Check your connection."); return; }
+  store.set("yf-me-" + S.id, JSON.stringify({ pid, name }));
+  S.joinName = "";
+  render();
+}
+async function saveMine(map){
+  const mine = me(); if (!mine) return;
+  const clean = {};
+  for (const k in map) if (map[k]) clean[k] = map[k];
+  try { await write(S.id, ["avail", mine.pid], Object.keys(clean).length ? clean : null); }
+  catch (e){ toast("Couldn't save that. Try again."); }
+}
+async function setStatus(key, status){
+  const cur = Object.assign({}, myAvail());
+  if (status) cur[key] = status; else delete cur[key];
+  await saveMine(cur);
+}
+async function wholeDay(dayKey){
+  const mAv = Object.assign({}, myAvail());
+  const day = parseKey(dayKey + "_00").d;
+  const m = model(S.session);
+  const keys = m.hours.map(h => slotKey(day, h)).filter(k => !isPast(parseKey(k).d, parseKey(k).h));
+  const allOn = keys.length && keys.every(k => mAv[k] === "free");
+  keys.forEach(k => { if (allOn) delete mAv[k]; else mAv[k] = "free"; });
+  await saveMine(mAv);
+}
+async function bookIt(){
+  const M = S.m;
+  const d = new Date(M.date + "T00:00");
+  if (isNaN(d)) { toast("Pick a day first."); return; }
+  const key = slotKey(d, +M.time);
+  await write(S.id, ["booked"], { key, dur: M.dur });
+  toast("Booked");
+}
+async function saveSettings(){
+  const M = S.m;
+  const name = (M.name || "").trim().replace(/\s+/g, " ");
+  if (!name){ toast("Give it a name."); return; }
+  try {
+    await write(S.id, ["name"], name);
+    await write(S.id, ["need"], M.need);
+    await write(S.id, ["from"], M.from);
+    await write(S.id, ["to"], M.to);
+    toast("Saved");
+  } catch (e){ toast("Couldn't save. Try again."); }
+}
+
+function act(name, el){
+  const d = el.dataset;
+  switch (name){
+    case "create": return createSession();
+    case "need": {
+      const v = Math.max(0, Math.min(20, S.draft.need + Number(d.d)));
+      S.draft.need = v; return render();
+    }
+    case "mneed": {
+      S.m.need = Math.max(0, Math.min(20, S.m.need + Number(d.d))); return render();
+    }
+    case "copy": return copyText(d.text);
+    case "open": location.hash = "#s/" + S.created.id; S.created = null; return;
+    case "join": return join();
+    case "switchme": store.set("yf-me-" + S.id, null); return render();
+    case "week": S.week = Math.max(0, Math.min(3, S.week + Number(d.d))); return render();
+    case "cell": { S.sel = d.k; return render(); }
+    case "best": { S.sel = d.k; const p = parseKey(d.k); S.week = Math.max(0, Math.min(3, Math.floor((p.d - weekDays(0)[0]) / 864e5 / 7))); return render(); }
+    case "status": { setStatus(S.sel, d.s); return; }
+    case "day": { wholeDay(d.d); return; }
+    case "wholeday": { wholeDay(d.d); return; }
+    case "mbook": return bookIt();
+    case "mclear": return write(S.id, ["booked"], null);
+    case "msave": return saveSettings();
+    case "mdel": {
+      if (!S.delArm){ S.delArm = true; return render(); }
+      write(S.id, [], null).then(() => { location.hash = ""; toast("Session deleted"); });
+      return;
+    }
+  }
+}
+
+document.addEventListener("click", e => {
+  const t = e.target.closest("[data-act]");
+  if (!t) return;
+  if (t.tagName === "A") return; // links work normally
+  e.preventDefault();
+  act(t.dataset.act, t);
+});
+document.addEventListener("input", e => {
+  const t = e.target.closest("[data-in]"); if (!t) return;
+  const v = t.value;
+  switch (t.dataset.in){
+    case "name": S.draft.name = v; break;
+    case "joinName": S.joinName = v; break;
+    case "mName": S.m.name = v; break;
+    case "mDate": S.m.date = v; break;
+  }
+});
+document.addEventListener("change", e => {
+  const t = e.target.closest("[data-in]"); if (!t) return;
+  const v = t.value;
+  if (!S.m && S.route === "manage") return;
+  switch (t.dataset.in){
+    case "mTime": S.m.time = v; break;
+    case "mDur": S.m.dur = v; break;
+    case "mFrom": S.m.from = +v; if (S.m.to <= S.m.from) S.m.to = S.m.from + 1; render(); break;
+    case "mTo": S.m.to = +v; break;
+  }
+});
+document.addEventListener("keydown", e => {
+  if (e.key === "Enter" && e.target.matches("[data-in=joinName]")){ e.preventDefault(); join(); }
+});
+document.getElementById("topLink").addEventListener("click", e => { e.preventDefault(); location.hash = ""; S.created = null; });
+window.addEventListener("hashchange", () => { S.created = null; route(); });
+
+route();
+})();
+</script>
+</body>
+</html>
