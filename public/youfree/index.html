@@ -410,7 +410,7 @@ function viewSession(){
       seg +
       '<div class="row">' + dayBtn + (sess.booked ? "" : "") + "</div>" +
     "</section>" +
-    '<p class="small" style="text-align:center;margin:0">Tap a slot to see who\'s free. Tap a day name to select the whole day.</p>' +
+    '<p class="small" style="text-align:center;margin:0">Tap a time once for Free, twice for Maybe, and a third time to clear it.</p>' +
     (mine ? '<p class="small" style="text-align:center;margin:0">Playing as ' + esc(mine.name) + ' · <button type="button" class="link-btn" data-act="switchme" style="background:none;border:0;padding:0;color:var(--orange);font-weight:700;text-decoration:underline">not you?</button></p>' : "") +
     (n >= 1 && m.need && n >= m.need ? '<div class="row"><a class="btn primary" target="_blank" rel="noopener" href="' + esc(waLink(sess, S.sel, freeNow)) + '">Send to WhatsApp</a></div>' : "") +
     (S.online ? "" : '<p class="error" style="margin:0">Can\'t reach the calendar right now. Your taps will try again when you\'re back online.</p>');
@@ -623,7 +623,22 @@ function act(name, el){
     case "join": return join();
     case "switchme": store.set("yf-me-" + S.id, null); return render();
     case "week": S.week = Math.max(0, Math.min(3, S.week + Number(d.d))); return render();
-    case "cell": { S.sel = d.k; return render(); }
+    case "cell": {
+      S.sel = d.k;
+      const mine = me();
+      const p = parseKey(d.k);
+      if (mine && !isPast(p.d, p.h)){
+        // one tap: Free, second tap: Maybe, third tap: clear back to Not free
+        const cur = myAvail()[d.k] || "";
+        const next = cur === "" ? "free" : cur === "free" ? "maybe" : "";
+        if (S.session && S.session.avail){
+          S.session.avail[mine.pid] = Object.assign({}, S.session.avail[mine.pid] || {});
+          if (next) S.session.avail[mine.pid][d.k] = next; else delete S.session.avail[mine.pid][d.k];
+        }
+        setStatus(d.k, next);
+      }
+      return render();
+    }
     case "best": { S.sel = d.k; const p = parseKey(d.k); S.week = Math.max(0, Math.min(3, Math.floor((p.d - weekDays(0)[0]) / 864e5 / 7))); return render(); }
     case "status": { setStatus(S.sel, d.s); return; }
     case "day": { wholeDay(d.d); return; }
