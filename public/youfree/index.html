@@ -283,6 +283,32 @@ function bestSlots(m){
 }
 function ownerKeyFor(id){ return store.get("yf-owner-" + id); }
 
+/* ---------- sessions remembered on this phone ---------- */
+function recent(){ try { return JSON.parse(store.get("yf-sessions") || "[]"); } catch (e) { return []; } }
+function saveRecent(list){ store.set("yf-sessions", JSON.stringify(list)); }
+function rememberSession(id, name, owner){
+  const list = recent().filter(x => x.id !== id);
+  list.unshift({ id, name, owner: !!owner || !!ownerKeyFor(id) });
+  saveRecent(list.slice(0, 30));
+}
+function syncRemembered(sess){
+  if (!S.id) return;
+  if (sess === null){ saveRecent(recent().filter(x => x.id !== S.id)); return; }
+  if (!sess) return;
+  if (!ownerKeyFor(S.id) && !me()) return; // only sessions you started or joined
+  rememberSession(S.id, sess.name);
+}
+function mySessionsHTML(){
+  const list = recent();
+  if (!list.length) return "";
+  return '<section class="card"><span class="kicker">Your sessions</span>' +
+    list.map(x =>
+      '<a class="btn block" href="#s/' + esc(x.id) + '" style="justify-content:space-between;text-align:left"><span>' + esc(x.name) + '</span><span style="font-size:12px">Open →</span></a>' +
+      (x.owner ? '<a class="small" href="#m/' + esc(x.id) + '" style="align-self:flex-end">Organiser link</a>' : "")
+    ).join("") +
+  "</section>";
+}
+
 /* ---------- views ---------- */
 function stepperHTML(act, value){
   const none = value === 0;
@@ -314,7 +340,7 @@ function viewStart(){
       '<button class="btn primary" type="button" data-act="open">Open session</button></div>' +
       "</section>";
   }
-  return '<section class="h1-wrap">' +
+  return mySessionsHTML() + '<section class="h1-wrap">' +
       '<h1 class="h1">Start a session</h1>' +
       '<p class="muted" style="margin:6px 0 0">Say what\'s happening, share the link, and let people tap when they\'re free.</p>' +
     "</section>" +
@@ -381,7 +407,6 @@ function viewSession(){
   const seg = mine && !isPast(selDay, selHour)
     ? '<div class="seg" role="group" aria-label="Your availability">' +
         '<button type="button" class="' + (statusNow === "free" ? "on" : "") + '" data-act="status" data-s="free">Free</button>' +
-        '<button type="button" class="' + (statusNow === "maybe" ? "on maybe" : "") + '" data-act="status" data-s="maybe">Maybe</button>' +
         '<button type="button" class="' + (statusNow === "" ? "on no" : "") + '" data-act="status" data-s="">Not free</button>' +
       "</div>"
     : (mine ? "" : '<p class="note" style="margin:0">Join above to tap your times.</p>');
@@ -406,11 +431,10 @@ function viewSession(){
       '<div class="dtitle"><span class="h2" style="font-size:21px">' + esc(fmtDay(selDay)) + ", " + fmtH(selHour) + "–" + fmtH(selHour + 1) + "</span>" +
       '<span class="small" style="font-weight:700">' + quip(n, m.need) + "</span></div>" +
       '<div class="chips">' + (freeNow.length ? freeNow.map((x, i) => '<span class="chip' + (m.need && i >= m.need ? " sub" : "") + '">' + esc(x) + (m.need && i >= m.need ? " (bench)" : "") + "</span>").join("") : '<span class="note">Nobody free in this hour yet.</span>') + "</div>" +
-      (maybeNow.length ? '<div class="note">Maybe: ' + maybeNow.map(esc).join(", ") + " · doesn't count towards the total</div>" : "") +
       seg +
       '<div class="row">' + dayBtn + (sess.booked ? "" : "") + "</div>" +
     "</section>" +
-    '<p class="small" style="text-align:center;margin:0">Tap a time once for Free, twice for Maybe, and a third time to clear it.</p>' +
+    '<p class="small" style="text-align:center;margin:0">Tap a time to mark yourself Free. Tap it again to clear it.</p>' +
     (mine ? '<p class="small" style="text-align:center;margin:0">Playing as ' + esc(mine.name) + ' · <button type="button" class="link-btn" data-act="switchme" style="background:none;border:0;padding:0;color:var(--orange);font-weight:700;text-decoration:underline">not you?</button></p>' : "") +
     (n >= 1 && m.need && n >= m.need ? '<div class="row"><a class="btn primary" target="_blank" rel="noopener" href="' + esc(waLink(sess, S.sel, freeNow)) + '">Send to WhatsApp</a></div>' : "") +
     (S.online ? "" : '<p class="error" style="margin:0">Can\'t reach the calendar right now. Your taps will try again when you\'re back online.</p>');
@@ -524,6 +548,7 @@ async function route(){
   S.key = S.route === "manage" ? (r.key || ownerKeyFor(S.id) || "") : undefined;
   S.stop = watch(S.id, async sess => {
     S.session = sess;
+    syncRemembered(sess);
     if (S.route === "manage" && sess && S.key){
       S.ownerOk = (await sha(S.key)) === sess.ownerHash;
     }
@@ -542,6 +567,7 @@ async function createSession(){
   const obj = { name, need: S.draft.need, from: 6, to: 24, ownerHash: await sha(key), created: Date.now() };
   try { await write(id, [], obj); } catch (e) { toast("Couldn't start it. Check your connection and try again."); return; }
   store.set("yf-owner-" + id, key);
+  rememberSession(id, name, true);
   S.created = { id, key, name };
   S.draft = { name: "", need: S.draft.need };
   render();
@@ -628,9 +654,9 @@ function act(name, el){
       const mine = me();
       const p = parseKey(d.k);
       if (mine && !isPast(p.d, p.h)){
-        // one tap: Free, second tap: Maybe, third tap: clear back to Not free
+        // one tap marks you Free, another tap clears it
         const cur = myAvail()[d.k] || "";
-        const next = cur === "" ? "free" : cur === "free" ? "maybe" : "";
+        const next = cur === "" ? "free" : "";
         if (S.session && S.session.avail){
           S.session.avail[mine.pid] = Object.assign({}, S.session.avail[mine.pid] || {});
           if (next) S.session.avail[mine.pid][d.k] = next; else delete S.session.avail[mine.pid][d.k];
